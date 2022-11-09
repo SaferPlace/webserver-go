@@ -19,9 +19,9 @@ func Logger(logger *zap.Logger) Option {
 func Services(services ...Service) Option {
 	return func(s *Server) error {
 		for _, service := range services {
-			name, path, handler := service()
+			path, handler := service()
 			s.services[path] = handler
-			s.logger.Info("registered service", zap.String("service", name))
+			s.logger.Info("registered service", zap.String("path", path))
 		}
 
 		return nil
