@@ -2,7 +2,12 @@
 
 package webserver
 
-import "go.uber.org/zap"
+import (
+	"crypto/tls"
+
+	"go.uber.org/zap"
+	"safer.place/webserver/middleware"
+)
 
 // Option allows to override the default behaviour of the Server.
 type Option func(*Server) error
@@ -24,6 +29,24 @@ func Services(services ...Service) Option {
 			s.logger.Info("registered service", zap.String("path", path))
 		}
 
+		return nil
+	}
+}
+
+// TLSConfig allows to set the TLS configuration for the server.
+func TLSConfig(cfg *tls.Config) Option {
+	return func(s *Server) error {
+		s.server.TLSConfig = cfg
+		return nil
+	}
+}
+
+// Middlewares allows to specify which middleware to use. This is also useful
+// if you want to override the default Cors middleware to limit which domains
+// CORS should be applicable to.
+func Middlewares(middlewares ...middleware.Middleware) Option {
+	return func(s *Server) error {
+		s.middleware = middlewares
 		return nil
 	}
 }
