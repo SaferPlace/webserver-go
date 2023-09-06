@@ -4,6 +4,7 @@ package webserver
 
 import (
 	"crypto/tls"
+	"time"
 
 	"go.uber.org/zap"
 	"safer.place/webserver/middleware"
@@ -47,6 +48,22 @@ func TLSConfig(cfg *tls.Config) Option {
 func Middlewares(middlewares ...middleware.Middleware) Option {
 	return func(s *Server) error {
 		s.middleware = middlewares
+		return nil
+	}
+}
+
+// ReadTimeout overrides the default read timeout for the HTTP Server
+func ReadTimeout(d time.Duration) Option {
+	return func(s *Server) error {
+		s.server.ReadTimeout = d
+		return nil
+	}
+}
+
+// WriteTimeout overrides the default write timeout for the HTTP Server
+func WriteTimeout(d time.Duration) Option {
+	return func(s *Server) error {
+		s.server.WriteTimeout = d
 		return nil
 	}
 }
