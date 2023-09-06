@@ -7,7 +7,8 @@ import (
 	"time"
 
 	"go.uber.org/zap"
-	"safer.place/webserver/middleware"
+
+	"github.com/saferplace/webserver-go/middleware"
 )
 
 // Option allows to override the default behaviour of the Server.
