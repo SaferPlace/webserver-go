@@ -9,15 +9,16 @@ import (
 	"time"
 
 	"go.uber.org/zap"
-	"safer.place/webserver/middleware"
+
+	"github.com/saferplace/webserver-go/middleware"
 )
 
 // Server hosts the connect service.
 type Server struct {
-	services           map[string]http.Handler
-	middleware         []middleware.Middleware
-	logger             *zap.Logger
-	server             *http.Server
+	services   map[string]http.Handler
+	middleware []middleware.Middleware
+	logger     *zap.Logger
+	server     *http.Server
 }
 
 // New creates a new connect server.
