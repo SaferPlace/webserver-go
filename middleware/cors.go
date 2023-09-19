@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"net/http"
+	"slices"
 
 	"github.com/rs/cors"
-	"golang.org/x/exp/slices"
 )
 
 // Cors allows to only allow known domains.

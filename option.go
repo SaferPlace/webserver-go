@@ -4,9 +4,8 @@ package webserver
 
 import (
 	"crypto/tls"
+	"log/slog"
 	"time"
-
-	"go.uber.org/zap"
 
 	"github.com/saferplace/webserver-go/middleware"
 )
@@ -15,7 +14,7 @@ import (
 type Option func(*Server) error
 
 // Logger overrides the default logger in the Server.
-func Logger(logger *zap.Logger) Option {
+func Logger(logger *slog.Logger) Option {
 	return func(s *Server) error {
 		s.logger = logger
 		return nil
@@ -27,8 +26,10 @@ func Services(services ...Service) Option {
 	return func(s *Server) error {
 		for _, service := range services {
 			path, handler := service()
-			s.services[path] = handler
-			s.logger.Info("registered service", zap.String("path", path))
+			s.handlers[path] = handler
+			s.logger.Info("registered service",
+				slog.String("path", path),
+			)
 		}
 
 		return nil

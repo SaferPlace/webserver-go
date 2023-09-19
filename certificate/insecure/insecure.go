@@ -5,11 +5,11 @@ import (
 	"crypto/tls"
 )
 
-// Provider provides no TLSConfig
+// Provider provides noop [certificate.Provider], which doesn't return a new [tls.Config].
 type Provider struct {
 }
 
-// NewProvider provies not security
+// NewProvider provides noop [certificate.Provider], which doesn't return a new [tls.Config].
 func NewProvider() *Provider {
 	return &Provider{}
 }

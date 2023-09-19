@@ -4,30 +4,27 @@ package webserver
 
 import (
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"time"
-
-	"go.uber.org/zap"
 
 	"github.com/saferplace/webserver-go/middleware"
 )
 
 // Server hosts the connect service.
 type Server struct {
-	services   map[string]http.Handler
+	handlers   map[string]http.Handler
 	middleware []middleware.Middleware
-	logger     *zap.Logger
+	logger     *slog.Logger
 	server     *http.Server
 }
 
 // New creates a new connect server.
 func New(opts ...Option) (*Server, error) {
-	logger, _ := zap.NewDevelopment()
-
 	s := &Server{
-		services: make(map[string]http.Handler),
-		logger:   logger,
+		handlers: make(map[string]http.Handler),
+		logger:   slog.Default(),
 		server: &http.Server{
 			ReadTimeout:  1 * time.Second,
 			WriteTimeout: 1 * time.Second,
@@ -48,8 +45,7 @@ func New(opts ...Option) (*Server, error) {
 	mux := http.NewServeMux()
 
 	// Register all the handlers
-	for path, handler := range s.services {
-		s.logger.Info("registering handler", zap.String("path", path))
+	for path, handler := range s.handlers {
 		mux.Handle(path, handler)
 	}
 
@@ -57,7 +53,7 @@ func New(opts ...Option) (*Server, error) {
 
 	// Register all middleware
 	for _, middleware := range s.middleware {
-		s.logger.Info("using middleware", zap.String("type", fmt.Sprintf("%T", middleware)))
+		s.logger.Info("using middleware", slog.String("name", fmt.Sprintf("%#v", middleware)))
 		handler = middleware(handler)
 	}
 
@@ -77,8 +73,8 @@ func (s *Server) Run(port int) error {
 	// Start insecurely if the TLSConfig is missing
 	if s.server.TLSConfig == nil {
 		s.logger.Info("starting server",
-			zap.Int("port", port),
-			zap.Bool("tls", false),
+			slog.Int("port", port),
+			slog.Bool("tls", false),
 		)
 		if err := s.server.Serve(lis); err != nil {
 			return fmt.Errorf("unable to listed on port %d: %w", port, err)
@@ -87,8 +83,8 @@ func (s *Server) Run(port int) error {
 
 	// Start a secure server if the TLSConfig is provided.
 	s.logger.Info("starting server",
-		zap.Int("port", port),
-		zap.Bool("tls", true),
+		slog.Int("port", port),
+		slog.Bool("tls", true),
 	)
 	if err := s.server.ServeTLS(lis, "", ""); err != nil {
 		return fmt.Errorf("unable to listed on port %d: %w", port, err)
